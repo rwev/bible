@@ -1,7 +1,11 @@
 import curses
 from curses import wrapper
-import reader
-import textwrap
+from reader import Reader
+from list import ListWindow
+# import textwrap
+from textwrap2 import wrap 
+from hyphen import Hyphenator
+
 
 TRANSLATIONS_WIDTH = 6
 BOOKS_WIDTH = 14
@@ -9,64 +13,15 @@ CHAPTERS_WIDTH = 4
 TEXT_WIDTH = 25
 VERSES_WIDTH = 4
 
-class ListWindow():
-    def __init__(self, win, title, item_tuples, width):
-
-        # win.addstr(title)
-        # win.box()
-
-        self._win = win
-        self._width = width
-
-        self._selected_tuple = item_tuples[0]
-        self.set_selection_tuples(item_tuples)
-        
-    def get_selection_tuple(self):
-        return self._selected_tuple
-
-    def set_selection_tuples(self, item_tuples):
-        self._item_tuples = item_tuples
-        if self._selected_tuple not in item_tuples:
-            self._selected_tuple = self._item_tuples[0]
-        self._bounds = (0, curses.LINES - 2)
-        self.draw()
-
-    def increment_selection(self, i):
-        new_index = self._selected_tuple[0] + i
-        if new_index < 0 or new_index >= len(self._item_tuples):
-            return
-
-        self._selected_tuple = self._item_tuples[self._selected_tuple[0] + i]
-        self.update_bounds()
-        self.draw()
-
-    def update_bounds(self):
-        index = self._selected_tuple[0]
-        (bound_lower, bound_upper) = self._bounds
-        if index >= bound_upper and index < len(self._item_tuples):
-            self._bounds = (bound_lower + 1, bound_upper + 1)
-        elif index < self._bounds[0]:
-            self._bounds = (bound_lower - 1, bound_upper - 1) 
-    
-    def draw(self):
-        self._win.clear()
-        for (i, val) in self._item_tuples[self._bounds[0]:self._bounds[1]]:
-            y = 1 + i - self._bounds[0]
-            str_len = self._width - 2
-            string = str(val).ljust(str_len)
-
-            if i == self._selected_tuple[0]:
-                self._win.addnstr(y, 1, string, str_len, curses.A_STANDOUT)
-            else: 
-                self._win.addnstr(y, 1, string, str_len)
-        self._win.refresh()
-
 def main(stdscr):
     stdscr.clear()
 
     def make_enumeration(list_):
         return list(enumerate(list_))
   
+    reader = Reader()
+    reader.set_root('MSG')
+
     translations_win = ListWindow(
             stdscr.derwin(
                 curses.LINES,
@@ -145,6 +100,8 @@ def main(stdscr):
 
     def update_selections():
         # TODO translations
+        trans = translations_win.get_selection_tuple()[1]
+        reader.set_root(trans)
 
         book = books_win.get_selection_tuple()[1]
         
@@ -153,17 +110,19 @@ def main(stdscr):
         chapters_win.set_selection_tuples(chapter_tuples)
 
 
+    h_en = Hyphenator('en_US')
     def update_text():
         text_win.clear()
         raw_text = reader.get_chapter_text(
                 books_win.get_selection_tuple()[1],
                 chapters_win.get_selection_tuple()[1],
                 )
-        text = ' '.join(
-                textwrap.fill(
-                    raw_text,
-                    text_width - 4
-                ).split('\n')[0: curses.LINES - 2])
+        text = '\n'.join(
+                wrap(
+                    str(raw_text).decode('utf8'),
+                    width=text_width - 3,
+                    use_hyphenator=h_en
+                )[0: curses.LINES - 2])
         text_win.addstr(text)
         text_win.refresh()
 
