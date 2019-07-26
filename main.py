@@ -20,7 +20,7 @@ def main(stdscr):
         return list(enumerate(list_))
   
     reader = Reader()
-    reader.set_root('MSG')
+    reader.set_root('AMP')
 
     translations_win = ListWindow(
             stdscr.derwin(
@@ -29,7 +29,7 @@ def main(stdscr):
                 0,
                 0
                 ),
-            'T.',
+            'TR',
             make_enumeration(reader.get_translations()),
             TRANSLATIONS_WIDTH
             )
@@ -41,31 +41,32 @@ def main(stdscr):
                         0,
                         TRANSLATIONS_WIDTH
                     ),
-                    'BK.',
+                    'BOOK',
                     make_enumeration(reader.get_books()),
                     BOOKS_WIDTH
                     )
 
     chapters_win = ListWindow(
-            stdscr.derwin(
-                curses.LINES,
-                CHAPTERS_WIDTH, 
-                0, 
-                TRANSLATIONS_WIDTH + BOOKS_WIDTH
-                ),
-            'CH.',
-            make_enumeration(reader.get_chapters('Genesis')),
-            CHAPTERS_WIDTH
-            )
+                    stdscr.derwin(
+                        curses.LINES,
+                        CHAPTERS_WIDTH, 
+                        0, 
+                        TRANSLATIONS_WIDTH + BOOKS_WIDTH
+                    ),
+                    'CH',
+                    make_enumeration(reader.get_chapters('Genesis')),
+                    CHAPTERS_WIDTH
+                    )
 
     verses_win = ListWindow(
             stdscr.derwin(
                 curses.LINES,
                 VERSES_WIDTH,
                 0,
-                curses.COLS - VERSES_WIDTH,
+                TRANSLATIONS_WIDTH + BOOKS_WIDTH
+                + CHAPTERS_WIDTH  #curses.COLS - VERSES_WIDTH,
                 ),
-            'VS.',
+            'VS',
             make_enumeration(reader.get_verses('Genesis', 1)), # TODO
             VERSES_WIDTH
             )
@@ -78,9 +79,10 @@ def main(stdscr):
             verses_win
             ])
     selected_window = windows_tuples[1]
+    selected_window[1].set_active(True)
 
     text_width= curses.COLS - TRANSLATIONS_WIDTH - BOOKS_WIDTH - CHAPTERS_WIDTH - VERSES_WIDTH
-    text_start = TRANSLATIONS_WIDTH + BOOKS_WIDTH + CHAPTERS_WIDTH
+    text_start = TRANSLATIONS_WIDTH + BOOKS_WIDTH + CHAPTERS_WIDTH + VERSES_WIDTH # TODO smarter start vars
     text_outer_win = stdscr.derwin(
                 curses.LINES,
                 text_width, 
@@ -88,7 +90,7 @@ def main(stdscr):
                 text_start
                 )
     text_outer_win.box()
-
+    # text_outer_win.vline(0, 0, '|', curses.LINES)
 
 
     text_win = text_outer_win.derwin(
@@ -109,14 +111,38 @@ def main(stdscr):
 
         chapters_win.set_selection_tuples(chapter_tuples)
 
+        chapter = chapters_win.get_selection_tuple()[1]
+
+        verses_tuples = make_enumeration(
+                reader.get_verses(book, chapter)
+                )
+
+        verses_win.set_selection_tuples(verses_tuples)
 
     h_en = Hyphenator('en_US')
     def update_text():
+        
+        trans_name = translations_win.get_selection_tuple()[1]
+        book_name = books_win.get_selection_tuple()[1]
+        chapter_name = chapters_win.get_selection_tuple()[1],
+        verse = verses_win.get_selection_tuple()[1]
+
+        text_title = " {0} {1}:{3} [{2}]".format(book_name, str(chapter_name[0]), trans_name, verse) # TODO
+        text_title_centered = text_title.center(text_width, ' ')
+
+        start_pad = len(text_title_centered) - len(text_title_centered.lstrip(' '))
+
+        text_outer_win.clear()
+        text_outer_win.box()
+        text_outer_win.addstr(0, start_pad, text_title)
+        text_outer_win.refresh()
+       
         text_win.clear()
+        
         raw_text = reader.get_chapter_text(
                 books_win.get_selection_tuple()[1],
                 chapters_win.get_selection_tuple()[1],
-                )
+                verse_start = verse                )
         text = '\n'.join(
                 wrap(
                     str(raw_text).decode('utf8'),
@@ -126,24 +152,32 @@ def main(stdscr):
         text_win.addstr(text)
         text_win.refresh()
 
+    def deactivate_all_windows():
+        for (i, win) in windows_tuples:
+            win.set_active(False)
+
     update_selections()
     update_text()
     
     key = None
-    while (key != 'q'): # TODO quit not working
+    while (key != ord('q')): # TODO quit not working
         key = stdscr.getch()
         if key == curses.KEY_UP:
             selected_window[1].increment_selection(-1)
         elif key == curses.KEY_DOWN:
             selected_window[1].increment_selection(1)
         elif key == curses.KEY_LEFT:
+            deactivate_all_windows()
             new_windex = selected_window[0] - 1
             if new_windex < 0: new_windex = len(windows_tuples) - 1
             selected_window = windows_tuples[new_windex]
+            selected_window[1].set_active(True)
         elif key == curses.KEY_RIGHT:
+            deactivate_all_windows()
             new_windex = selected_window[0] + 1
             if new_windex >= len(windows_tuples): new_windex = 0
             selected_window = windows_tuples[new_windex]
+            selected_window[1].set_active(True)
         update_selections()
         update_text()
 
