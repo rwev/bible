@@ -21,7 +21,7 @@ class Reader():
         self._current_root = (translation_str, self._roots[translation_str])
 
     def get_translations(self):
-        return [splitext(basename(f))[0] for f in glob('translations/*.xml')][:2] # DEV
+        return [splitext(basename(f))[0] for f in glob('translations/*.xml')]
     
     def get_books(self):
         return [bel.attrib['n'] for bel in self._current_root[1].findall('b')]
