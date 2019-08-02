@@ -1,6 +1,7 @@
 import curses
 
-class ListWindow():
+
+class ListWindow:
     def __init__(self, win, title, item_tuples, width):
 
         # win.addstr(title)
@@ -10,10 +11,10 @@ class ListWindow():
         self._width = width
         self._title = title
         self._active = False
-    
+
         self._selected_tuple = item_tuples[0]
         self.set_selection_tuples(item_tuples)
-    
+
     def set_active(self, is_active):
         self._active = is_active
         self.draw()
@@ -43,24 +44,29 @@ class ListWindow():
         if index >= bound_upper and index < len(self._item_tuples):
             self._bounds = (bound_lower + 1, bound_upper + 1)
         elif index < self._bounds[0]:
-            self._bounds = (bound_lower - 1, bound_upper - 1) 
-    
+            self._bounds = (bound_lower - 1, bound_upper - 1)
+
     def write_title(self):
-        self._win.addnstr(0, 0, self._title.center(self._width, ' '), self._width, curses.A_UNDERLINE) 
+        self._win.addnstr(
+            0, 0, self._title.center(self._width, " "), self._width, curses.A_UNDERLINE
+        )
 
     def draw(self):
         self._win.clear()
         self.write_title()
-        for (i, val) in self._item_tuples[self._bounds[0]:self._bounds[1]]:
+        for (i, val) in self._item_tuples[self._bounds[0] : self._bounds[1]]:
             y = 1 + i - self._bounds[0]
-            str_len = self._width - 2 
+            str_len = self._width - 2
             string = str(val).ljust(str_len)
 
             if i == self._selected_tuple[0]:
-                self._win.addnstr(y, 0, ">{0}".format(string), str_len + 1, curses.A_STANDOUT if
-                        self._active else curses.A_BOLD)
-            else: 
+                self._win.addnstr(
+                    y,
+                    0,
+                    ">{0}".format(string),
+                    str_len + 1,
+                    curses.A_STANDOUT if self._active else curses.A_BOLD,
+                )
+            else:
                 self._win.addnstr(y, 1, string, str_len)
         self._win.refresh()
-
-
