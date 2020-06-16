@@ -1,11 +1,11 @@
 # Bible
-Read the Bible with python and curses.
+Read the Bible in the terminal with Python and Curses.
 
 ![Preview](preview.png)
 
 ## Installation
 ```shell
-$ pip install https://github.com/rwev/bible/archive/master.zip
+$ python3 -m pip install https://github.com/rwev/bible/archive/master.zip
 ```
 
 ## Usage 
@@ -15,9 +15,12 @@ $ bible
 Use the arrow keys to navigate and make selections. 
 
 ## Development
+
+Using [resurgence](http://github.com/rwev/resurgence): 
+
 ```shell
-/resurgence $ pip install http://github.com/rwev/resurgence/archive/master.zip
-/resurgence $ resurgence -w -x "python main.py -t .py"
+$ python3 -m pip install http://github.com/rwev/resurgence/archive/master.zip
+$ resurgence -w -x "python main.py -t .py"
 ```
 
 ## TODO

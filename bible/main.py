@@ -1,12 +1,11 @@
 import curses
 
-from reader import Reader
-
 from textwrap2 import wrap
 from hyphen import Hyphenator
 
-from textwin import TextWindow
-from listwin import ListWindow
+from .reader import Reader
+from .textwin import TextWindow
+from .listwin import ListWindow
 
 TRANSLATIONS_WIDTH = 6
 BOOKS_WIDTH = 14
@@ -120,7 +119,7 @@ class Main:
         )
         text = "\n".join(
             wrap(
-                str(raw_text).decode("utf8"),
+                raw_text,
                 width=self.text_width - 3,
                 use_hyphenator=h_en,
             )[0 : curses.LINES - 2]
