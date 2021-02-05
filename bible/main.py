@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 import curses
 
 from textwrap2 import wrap
