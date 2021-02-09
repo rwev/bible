@@ -166,6 +166,32 @@ class Main:
                 self.selected_window = self.windows_tuples[new_windex]
                 self.selected_window[1].set_active(True)
 
+            if key == ord('k'):
+                self.selected_window[1].increment_selection(-1)
+
+            elif key == ord('j'):
+                self.selected_window[1].increment_selection(1)
+
+            elif key == ord('h'):
+                self.deactivate_all_windows()
+
+                new_windex = self.selected_window[0] - 1
+                if new_windex < 0:
+                    new_windex = len(self.windows_tuples) - 1
+
+                self.selected_window = self.windows_tuples[new_windex]
+                self.selected_window[1].set_active(True)
+
+            elif key == ord('l'):
+                self.deactivate_all_windows()
+
+                new_windex = self.selected_window[0] + 1
+                if new_windex >= len(self.windows_tuples):
+                    new_windex = 0
+
+                self.selected_window = self.windows_tuples[new_windex]
+                self.selected_window[1].set_active(True)
+
             self.update_selections()
             self.update_text()
 
