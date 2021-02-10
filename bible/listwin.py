@@ -38,6 +38,21 @@ class ListWindow:
         self.update_bounds()
         self.draw()
 
+    def select_last(self):
+        new_index = len(self._item_tuples) - 1
+
+        self._selected_tuple = self._item_tuples[new_index]
+        self.update_bounds()
+        self.draw()
+
+    def select_first(self):
+        new_index = 0 
+
+        self._selected_tuple = self._item_tuples[new_index]
+        self.update_bounds()
+        self.draw()
+
+
     def update_bounds(self):
         index = self._selected_tuple[0]
         (bound_lower, bound_upper) = self._bounds
