@@ -5,9 +5,9 @@ import curses
 from textwrap2 import wrap
 from hyphen import Hyphenator
 
-from reader import Reader
-from textwin import TextWindow
-from listwin import ListWindow
+from .reader import Reader
+from .textwin import TextWindow
+from .listwin import ListWindow
 
 TRANSLATIONS_WIDTH = 6
 BOOKS_WIDTH = 14
