@@ -2,8 +2,8 @@
 
 import curses
 
-from textwrap2 import wrap
 from hyphen import Hyphenator
+from textwrap2 import wrap
 
 from .reader import Reader
 from .textwin import TextWindow
@@ -124,7 +124,7 @@ class Main:
                 raw_text,
                 width=self.text_width - 3,
                 use_hyphenator=h_en,
-            )[0 : curses.LINES - 2]
+            )[0: curses.LINES - 2]
         )
 
         self.text_win.update_text_title(text_title)
@@ -134,66 +134,36 @@ class Main:
         for (i, win) in self.windows_tuples:
             win.set_active(False)
 
+    def increment_window(self, i):
+        self.deactivate_all_windows()
+        new_windex = self.selected_window[0] + i
+        if new_windex >= len(self.windows_tuples):
+            new_windex = 0
+        elif new_windex < 0:
+            new_windex = len(self.windows_tuples) - 1
+        self.selected_window = self.windows_tuples[new_windex]
+        self.selected_window[1].set_active(True)
+
     def start_input_loop(self):
         key = None
         while key != ord("q"):
 
             key = self.stdscr.getch()
 
-            if key == curses.KEY_UP:
+            if key == curses.KEY_UP or key == ord('k'):
                 self.selected_window[1].increment_selection(-1)
 
-            elif key == curses.KEY_DOWN:
+            elif key == curses.KEY_DOWN or key == ord('j'):
                 self.selected_window[1].increment_selection(1)
 
-            elif key == curses.KEY_LEFT:
-                self.deactivate_all_windows()
+            elif key == curses.KEY_LEFT or key == ord('h'):
+                self.increment_window(-1)
 
-                new_windex = self.selected_window[0] - 1
-                if new_windex < 0:
-                    new_windex = len(self.windows_tuples) - 1
-
-                self.selected_window = self.windows_tuples[new_windex]
-                self.selected_window[1].set_active(True)
-
-            elif key == curses.KEY_RIGHT:
-                self.deactivate_all_windows()
-
-                new_windex = self.selected_window[0] + 1
-                if new_windex >= len(self.windows_tuples):
-                    new_windex = 0
-
-                self.selected_window = self.windows_tuples[new_windex]
-                self.selected_window[1].set_active(True)
+            elif key == curses.KEY_RIGHT or key == ord('l'):
+                self.increment_window(1)
 
             elif key == ord('g'):
                 self.selected_window[1].select_first()
-
-            elif key == ord('k'):
-                self.selected_window[1].increment_selection(-1)
-
-            elif key == ord('j'):
-                self.selected_window[1].increment_selection(1)
-
-            elif key == ord('h'):
-                self.deactivate_all_windows()
-
-                new_windex = self.selected_window[0] - 1
-                if new_windex < 0:
-                    new_windex = len(self.windows_tuples) - 1
-
-                self.selected_window = self.windows_tuples[new_windex]
-                self.selected_window[1].set_active(True)
-
-            elif key == ord('l'):
-                self.deactivate_all_windows()
-
-                new_windex = self.selected_window[0] + 1
-                if new_windex >= len(self.windows_tuples):
-                    new_windex = 0
-
-                self.selected_window = self.windows_tuples[new_windex]
-                self.selected_window[1].set_active(True)
 
             self.update_selections()
             self.update_text()
