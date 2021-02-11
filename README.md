@@ -19,8 +19,10 @@ Use the arrow keys to navigate and make selections.
 Using [resurgence](http://github.com/rwev/resurgence): 
 
 ```shell
+$ git clone https://github.com/rwev/bible.git
 $ python3 -m pip install http://github.com/rwev/resurgence/archive/master.zip
-$ resurgence -w -x "python main.py -t .py"
+$ cd ./bible/bible
+$ resurgence -w -x "python3 main.py" -t .py
 ```
 
 ## TODO

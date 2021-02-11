@@ -166,9 +166,6 @@ class Main:
                 self.selected_window = self.windows_tuples[new_windex]
                 self.selected_window[1].set_active(True)
 
-            elif key == ord('G'):
-                self.selected_window[1].select_last()
-
             elif key == ord('g'):
                 self.selected_window[1].select_first()
 
