@@ -5,9 +5,9 @@ import curses
 from textwrap2 import wrap
 from hyphen import Hyphenator
 
-from .reader import Reader
-from .textwin import TextWindow
-from .listwin import ListWindow
+from reader import Reader
+from textwin import TextWindow
+from listwin import ListWindow
 
 TRANSLATIONS_WIDTH = 6
 BOOKS_WIDTH = 14
@@ -157,6 +157,38 @@ class Main:
                 self.selected_window[1].set_active(True)
 
             elif key == curses.KEY_RIGHT:
+                self.deactivate_all_windows()
+
+                new_windex = self.selected_window[0] + 1
+                if new_windex >= len(self.windows_tuples):
+                    new_windex = 0
+
+                self.selected_window = self.windows_tuples[new_windex]
+                self.selected_window[1].set_active(True)
+
+            elif key == ord('G'):
+                self.selected_window[1].select_last()
+
+            elif key == ord('g'):
+                self.selected_window[1].select_first()
+
+            elif key == ord('k'):
+                self.selected_window[1].increment_selection(-1)
+
+            elif key == ord('j'):
+                self.selected_window[1].increment_selection(1)
+
+            elif key == ord('h'):
+                self.deactivate_all_windows()
+
+                new_windex = self.selected_window[0] - 1
+                if new_windex < 0:
+                    new_windex = len(self.windows_tuples) - 1
+
+                self.selected_window = self.windows_tuples[new_windex]
+                self.selected_window[1].set_active(True)
+
+            elif key == ord('l'):
                 self.deactivate_all_windows()
 
                 new_windex = self.selected_window[0] + 1
