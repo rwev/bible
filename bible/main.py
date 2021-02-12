@@ -165,6 +165,9 @@ class Main:
             elif key == ord('g'):
                 self.selected_window[1].select_first()
 
+            elif key == ord('L'):
+                self.selected_window[1].select_last()
+
             self.update_selections()
             self.update_text()
 

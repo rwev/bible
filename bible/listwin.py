@@ -50,6 +50,16 @@ class ListWindow:
         self._bounds = (0, self.MAX_ITEMS)
         self.draw()
 
+    def select_last(self):
+        if curses.LINES -3 >= len(self._item_tuples) - 1:   
+            new_index = len(self._item_tuples) - 1
+        else:
+            new_index = (curses.LINES -3)
+        
+        self._selected_tuple = self._item_tuples[new_index]
+        self._bounds = (0, self.MAX_ITEMS)
+        self.draw()
+
     def write_title(self):
         self._win.addnstr(
             0, 0, self._title.center(self._width, " "), self._width, curses.A_UNDERLINE
